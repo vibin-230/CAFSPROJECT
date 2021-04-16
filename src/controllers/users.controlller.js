@@ -266,7 +266,7 @@ exports.editEmployee = async (req, res) => {
       });
       return;
     }
-    let employeeDoc = await employeeSchema.findOne({_id : body.id})
+    let employeeDoc = await employeeSchema.findOne({ _id: body.id });
     if (!employeeDoc || !employeeDoc.id) {
       sendResponse(res, 404, { message: "User does not exist" });
       return;
@@ -296,6 +296,7 @@ exports.editEmployee = async (req, res) => {
         message: "User update failed",
         error: updateDoc.toString(),
       });
+      ``;
       return;
     }
   } catch (error) {
@@ -340,7 +341,7 @@ exports.deleteEmployee = async (req, res) => {
   }
 };
 
-exports.getAllEmployee = async (req,res) =>{
+exports.getAllEmployee = async (req, res) => {
   const { isLoggedIn, body } = req;
   try {
     if (!isLoggedIn) {
@@ -351,11 +352,11 @@ exports.getAllEmployee = async (req,res) =>{
       return;
     }
     let employeesDoc = await employeeSchema.find();
-    if(employeesDoc && employeesDoc.length){
-      sendResponse(res,200,{message:"Success", result : employeesDoc})
+    if (employeesDoc && employeesDoc.length) {
+      sendResponse(res, 200, { message: "Success", result: employeesDoc });
     }
-    if(employeesDoc && !employeesDoc.length){
-      sendResponse(res,404,{message:"No records found"})
+    if (employeesDoc && !employeesDoc.length) {
+      sendResponse(res, 404, { message: "No records found" });
     }
   } catch (error) {
     sendResponse(res, 400, {
@@ -364,5 +365,4 @@ exports.getAllEmployee = async (req,res) =>{
     });
     return;
   }
-
-}
+};

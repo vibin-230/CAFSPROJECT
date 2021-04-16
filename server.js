@@ -4,20 +4,17 @@ require("dotenv").config();
 const services = require("./services");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const PORT = process.env.PORT
+const PORT = process.env.PORT;
 const { createMiddleware } = require("./middlewares");
 const middleware = createMiddleware();
 const jsonwebtoken = require("jsonwebtoken");
-const commonCtrl = require("./src/controllers/common.controller")
-
-
-
+const commonCtrl = require("./src/controllers/common.controller");
 
 // create express app
 const app = express();
 app.use(cors());
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 mongoose
   .connect(process.env.mongoDB, {
@@ -35,76 +32,53 @@ mongoose
     process.exit();
   });
 
+//JWT decoder
+// app.use(function (req, res, next) {
+//   if (
+//     req.headers &&
+//     req.headers.authorization &&
+//     req.headers.authorization.split(" ")[0] === "Bearer"
+//   ) {
+//     jsonwebtoken.verify(
+//       req.headers.authorization.split(" ")[1],
+//       process.env.apiKey,
+//       function (err, decode) {
+//         if (err) req.user = undefined;
+//         req.user = decode;
+//         next();
+//       }
+//     );
+//   } else {
+//     req.user = undefined;
+//     next();
+//   }
+// });
 
-  //JWT decoder
-  app.use(function (req, res, next) {
-    if (
-      req.headers &&
-      req.headers.authorization &&
-      req.headers.authorization.split(" ")[0] === "Bearer"
-    ) {
-      jsonwebtoken.verify(
-        req.headers.authorization.split(" ")[1],
-        process.env.apiKey,
-        function (err, decode) {
-          if (err) req.user = undefined;
-          req.user = decode;
-          next();
-        }
-      );
-    } else {
-      req.user = undefined;
-      next();
-    }
-  });
+//check logged in
+// app.use(async function (req, res, next) {
+//   if (req.headers && req.headers.logintoken) {
+//     const result = await commonCtrl.checkUserLoggedin(req);
+//     if (result.isLoggedIn) {
+//       req.isLoggedIn = true;
+// 	req.userDoc = result.userDoc
+//     }
+//     next();
+//   } else {
+//   req.isLoggedIn = false;
+//   req.userDoc = {}
+//     next();
+//   }
+// });
 
-  //check logged in
-  app.use(async function (req, res, next) {
-    if (req.headers && req.headers.logintoken) {
-      const result = await commonCtrl.checkUserLoggedin(req);
-      if (result.isLoggedIn) {
-        req.isLoggedIn = true;
-		req.userDoc = result.userDoc
-      }
-      next();
-    } else {
-	  req.isLoggedIn = false;
-	  req.userDoc = {}
-      next();
-    }
-  });
-
-  // define a simple route
+// define a simple route
 app.get("/", (req, res) => {
-	res.json({
-	  message: "CAFS APIs"
-	});
+  res.json({
+    message: "CAFS APIs",
   });
-  services({ app, middleware });
+});
+services({ app, middleware });
 
-  // Error handler
-  const errorHandler = (err, req, res, next) => {
-    const {
-      user,
-    } = req;
-
-    if (typeof err === "string") err = new Error(err);
-
-    if (!err) err = new Error("An error occured");
-
-    if (!err.statusCode) err.statusCode = 500;
-
-
-    return res
-      .status(err.statusCode)
-      .send({ message : "An Unkown Error Occured", error: err.message});
-  };
-
-  // Should be the last handler
-  app.use(errorHandler);
-
-
-  // listen for requests
+// listen for requests
 app.listen(PORT, () => {
-	console.log("Server is listening on port", PORT);
-  });
+  console.log("Server is listening on port", PORT);
+});
